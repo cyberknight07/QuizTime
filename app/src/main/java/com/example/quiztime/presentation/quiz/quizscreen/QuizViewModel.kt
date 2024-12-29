@@ -36,11 +36,8 @@ class QuizViewModel @Inject constructor(val getQuizUseCases: GetQuizUseCases) : 
                         _quizStateList.value = StateQuizScreen(isLoading = true)
                     }
                     is Resource.Success -> {
-                        Log.d("Succes", "Success")
-                        for(quiz : Quiz in it.data!!){
-                            Log.d("Quizzz", quiz.toString())
-                        }
-                        _quizStateList.value = StateQuizScreen(data = it.data)
+                        val listOfQSdata : List<QuizState> = getListOfQuizStateData(it.data)
+                        _quizStateList.value = StateQuizScreen(qsData = listOfQSdata)
                     }
                     is Resource.Error -> {
                         _quizStateList.value = StateQuizScreen(error = it.message.toString())
@@ -49,5 +46,20 @@ class QuizViewModel @Inject constructor(val getQuizUseCases: GetQuizUseCases) : 
                 }
             }
         }
+    }
+    private fun getListOfQuizStateData(data: List<Quiz>?) : List<QuizState>{
+
+        val listOfQSdata = mutableListOf<QuizState>()
+
+        for(quiz : Quiz in data!!) {
+
+            val shuffleOptions = mutableListOf<String>().apply {
+                add(quiz.correct_answer)
+                addAll(quiz.incorrect_answers)
+                shuffle()
+            }
+            listOfQSdata.add(QuizState(quiz, shuffleOptions, -1))
+        }
+        return listOfQSdata
     }
 }

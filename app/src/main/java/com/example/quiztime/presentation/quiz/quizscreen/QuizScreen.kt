@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -27,7 +28,7 @@ import com.example.quiztime.presentation.quiz.component.QuizHeader
 import com.example.quiztime.presentation.quiz.component.QuizMainInterface
 import com.example.quiztime.presentation.quiz.component.QuizTopBar
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun PreviewQuizView(){
     QuizScreen(
@@ -38,7 +39,7 @@ fun PreviewQuizView(){
         state = StateQuizScreen(),
         event = {},
     )
-}
+}*/
 
 @Composable
 fun QuizScreen(
@@ -65,9 +66,7 @@ fun QuizScreen(
 
 
     Column(
-        Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        Modifier.fillMaxSize()
     ) {
         QuizTopBar(
             category,
@@ -83,37 +82,63 @@ fun QuizScreen(
             difficulty = difficulty
         )
         Spacer(Modifier.height(Dimens.SmallSpacerHt))
-        QuizMainInterface(
-            onOptSelected = {},
-            questionNumber = 1,
-            modifier = Modifier.weight(1f)
-        )
 
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = Dimens.MediumPadding).navigationBarsPadding()) {
+        if(quizFetched(state = state)) {
 
-            ButtonBox(
-                text = "Previous",
-                borderColor = colorResource(R.color.darker_gray),
-                textColor = colorResource(R.color.black),
-                containerColor = colorResource(R.color.darker_gray),
-                fontSize = Dimens.MediumTextSize,
-                onClick = {},
-                fraction = .47F,
-                padding = Dimens.SmallPadding
-            )
-            ButtonBox(
-                text = "Next",
-                borderColor = colorResource(R.color.darker_gray),
-                textColor = colorResource(R.color.black),
-                containerColor = colorResource(R.color.darker_gray),
-                fontSize = Dimens.MediumTextSize,
-                onClick = {},
-                fraction = 1F,
-                padding = Dimens.SmallPadding
+            QuizMainInterface(
+                onOptSelected = {},
+                questionNumber = 1,
+                modifier = Modifier.weight(1f)
             )
 
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = Dimens.MediumPadding)
+                    .navigationBarsPadding()
+            ) {
+
+                ButtonBox(
+                    text = "Previous",
+                    borderColor = colorResource(R.color.darker_gray),
+                    textColor = colorResource(R.color.black),
+                    containerColor = colorResource(R.color.darker_gray),
+                    fontSize = Dimens.MediumTextSize,
+                    onClick = {},
+                    fraction = .47F,
+                    padding = Dimens.SmallPadding
+                )
+                ButtonBox(
+                    text = "Next",
+                    borderColor = colorResource(R.color.darker_gray),
+                    textColor = colorResource(R.color.black),
+                    containerColor = colorResource(R.color.darker_gray),
+                    fontSize = Dimens.MediumTextSize,
+                    onClick = {},
+                    fraction = 1F,
+                    padding = Dimens.SmallPadding
+                )
+
+            }
         }
 
+    }
+}
 
+
+@Composable
+fun quizFetched(state: StateQuizScreen) : Boolean {
+
+    return when {
+        state.isLoading -> {
+            ShimmerQuizScreen()
+            false
+        }
+        state.qsData?.isNotEmpty() == true -> {
+            true
+        }
+
+        else -> {
+            Text(state.error.toString())
+            false
+        }
     }
 }
